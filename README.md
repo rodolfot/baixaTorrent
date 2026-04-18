@@ -110,21 +110,29 @@ python baixa_torrent.py
 
 ## Como funciona internamente
 
-O programa opera em **duas fases sequenciais**:
+O programa opera em **2 fases sequenciais**. A fase 1 precisa terminar completamente antes da fase 2 começar.
+
+| Fase | Nome | Tecnologia | O que faz |
+|---|---|---|---|
+| **1** | Mapeamento | `requests` + 50 workers | Varre todo o site coletando links — sem baixar nada |
+| **2** | Download | `requests` + Playwright | Baixa os arquivos encontrados na fase 1 |
 
 ### Fase 1 — Mapeamento
 
-Usa `requests` + `BeautifulSoup` com **50 workers em paralelo** para varrer todo o site rapidamente.
+Usa `requests` + `BeautifulSoup` com **50 workers em paralelo** para varrer todo o site rapidamente, **sem baixar nenhum arquivo ainda**.
 
-- Inicia na URL raiz e segue todos os links do mesmo domínio (BFS)
-- Coleta URLs de arquivos `.torrent` e links `magnet:` em cada página
+- Inicia na URL raiz e segue todos os links do mesmo domínio (BFS — busca em largura)
+- Coleta URLs de arquivos `.torrent` e links `magnet:` em cada página visitada
 - Ignora arquivos de mídia, CSS, JS e domínios de anúncios conhecidos
 - Salva o estado a cada 30 páginas em `evidencias/estados/<dominio>.json`
-- Exibe contador de páginas visitadas, itens na fila e totais encontrados
+- A barra superior exibe em tempo real:
+  - **Páginas** — total de páginas já visitadas
+  - **Na fila** — quantas páginas ainda aguardam para ser visitadas (trabalho pendente). Quando chega a 0, o mapeamento está completo
+  - **Torrents / Magnets** — totais encontrados até o momento
 
 ### Fase 2 — Download
 
-Após o mapeamento completo:
+Somente após o mapeamento completo do site, inicia os downloads:
 
 1. **Downloads diretos** — baixa todos os `.torrent` encontrados via `requests` em paralelo
 2. **Playwright** — para páginas que exigem interação (anúncios, redirecionamentos, contadores regressivos):
