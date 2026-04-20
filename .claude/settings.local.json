@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip show *)",
+      "Bash(python -c \"import os, psutil; print\\('CPUs lógicas:', os.cpu_count\\(\\)\\); m=psutil.virtual_memory\\(\\); print\\(f'RAM total: {m.total/1024**3:.1f} GB'\\); print\\(f'RAM disponível: {m.available/1024**3:.1f} GB'\\)\")",
+      "Bash(python -c \"import os; print\\('CPUs lógicas:', os.cpu_count\\(\\)\\)\")",
+      "Bash(powershell *)",
+      "Bash(git init *)",
+      "Bash(git remote *)"
+    ]
+  }
+}
